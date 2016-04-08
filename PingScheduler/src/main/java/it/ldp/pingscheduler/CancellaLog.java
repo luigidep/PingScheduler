@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 public class CancellaLog {
-	final static Logger log = Logger.getLogger(utility.class.getName());
+	final static Logger log = Logger.getLogger(Utility.class.getName());
 	static String JDBC_DRIVER_p = "org.postgresql.Driver";
 	static String DB_URL_p = "jdbc:postgresql://localhost:5432/astelu";
 	// Database credentials
@@ -66,7 +66,7 @@ public class CancellaLog {
 			String yyyymmdd = StringUtils.substringBefore(localDateTime.toString(), "T");
 			sql += "\nand data < '" + yyyymmdd + "'";
 
-			if (StringUtils.equals(constant.CANCELLA_PINGOK, tipolog))
+			if (StringUtils.equals(Constant.CANCELLA_PINGOK, tipolog))
 				sql += "\nand ploss = 0";
 
 			log.info("sql:" + sql);

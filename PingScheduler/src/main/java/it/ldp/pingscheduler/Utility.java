@@ -9,8 +9,8 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-public class utility {
-	final static Logger log = Logger.getLogger(utility.class.getName());
+public class Utility {
+	final static Logger log = Logger.getLogger(Utility.class.getName());
 	// JDBC driver name and database URL
 	static String JDBC_DRIVER_p = "org.postgresql.Driver";
 	static String DB_URL_p = "jdbc:postgresql://localhost:5432/astelu";

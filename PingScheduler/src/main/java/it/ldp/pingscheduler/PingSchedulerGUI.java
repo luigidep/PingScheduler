@@ -111,12 +111,12 @@ public class PingSchedulerGUI extends javax.swing.JFrame {
 		jLabel6.setText("livello di log");
 
 		jComboLogLevel.setModel(new javax.swing.DefaultComboBoxModel(
-				new String[] { constant.LOGLEVEL_TUTTO, constant.LOGLEVEL_PINGKO }));
+				new String[] { Constant.LOGLEVEL_TUTTO, Constant.LOGLEVEL_PINGKO }));
 		jComboLogLevel.setSelectedIndex(0);
 		jLabel7.setText("periodo di ping");
 
 		jComboPeriodo.setModel(
-				new javax.swing.DefaultComboBoxModel(new String[] { constant.PERIODO_SEMPRE, constant.PERIODO_7_21 }));
+				new javax.swing.DefaultComboBoxModel(new String[] { Constant.PERIODO_SEMPRE, Constant.PERIODO_ORARIO }));
 		jComboPeriodo.setSelectedIndex(0);
 
 		javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -195,21 +195,21 @@ public class PingSchedulerGUI extends javax.swing.JFrame {
 
 		jLabel5.setText("Cancellazione log antecedenti a:");
 
-		jRadioButtonCanc1day.setText(constant.CANCELLA_1DAY);
+		jRadioButtonCanc1day.setText(Constant.CANCELLA_1DAY);
 		jRadioButtonCanc1day.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				jRadioButton1ActionPerformed(evt);
 			}
 		});
 
-		jRadioButtonCanc7days.setText(constant.CANCELLA_7DAYS);
+		jRadioButtonCanc7days.setText(Constant.CANCELLA_7DAYS);
 		jRadioButtonCanc7days.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				jRadioButton2ActionPerformed(evt);
 			}
 		});
 
-		jRadioButtonCanc1month.setText(constant.CANCELLA_1MONTH);
+		jRadioButtonCanc1month.setText(Constant.CANCELLA_1MONTH);
 		jRadioButtonCanc1month.setSelected(true);
 		jRadioButtonCanc1month.setActionCommand("1m");
 		jRadioButtonCanc1month.addActionListener(new java.awt.event.ActionListener() {
@@ -231,15 +231,15 @@ public class PingSchedulerGUI extends javax.swing.JFrame {
 			}
 		});
 
-		jRadioButtonCancTutto.setText(constant.CANCELLA_TUTTO);
+		jRadioButtonCancTutto.setText(Constant.CANCELLA_TUTTO);
 		jRadioButtonCancTutto.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				jRadioButton4ActionPerformed(evt);
 			}
 		});
 
-		jRadioButtonCancPingOK.setText(constant.CANCELLA_PINGOK);
-		jRadioButtonCancPingOK.setActionCommand(constant.CANCELLA_PINGOK);
+		jRadioButtonCancPingOK.setText(Constant.CANCELLA_PINGOK);
+		jRadioButtonCancPingOK.setActionCommand(Constant.CANCELLA_PINGOK);
 		jRadioButtonCancPingOK.setSelected(true);
 		jRadioButtonCancPingOK.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -402,12 +402,12 @@ public class PingSchedulerGUI extends javax.swing.JFrame {
 
 	private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {
 		// TODO add your handling code here:
-		jRadioButtonCancTutto.setActionCommand(constant.CANCELLA_TUTTO);
+		jRadioButtonCancTutto.setActionCommand(Constant.CANCELLA_TUTTO);
 	}
 
 	private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {
 		// TODO add your handling code here:
-		jRadioButtonCancPingOK.setActionCommand(constant.CANCELLA_PINGOK);
+		jRadioButtonCancPingOK.setActionCommand(Constant.CANCELLA_PINGOK);
 	}
 
 	/**

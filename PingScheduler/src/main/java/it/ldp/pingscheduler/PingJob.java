@@ -8,9 +8,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -41,33 +44,42 @@ public class PingJob implements Job {
 	static final String USER = "jdbc";
 	static final String PASS = "jdbc";
 
-	//static Connection conn = null;
-	//static Statement stmt = null;
+	// static Connection conn = null;
+	// static Statement stmt = null;
 	static String nping = "5";
 	static String loglevel = "tutto";
 	static String periodo = "sempre";
 	static String intervallo = "15";
+
+	HashMap<String, String> pingKO = new HashMap<String, String>();
 
 	public void execute(JobExecutionContext jExeCtx) throws JobExecutionException {
 		log.info("start ping job parameter [intervallo,nping,loglevel,periodo]:[" + intervallo + "," + nping + ","
 				+ loglevel + "," + periodo + "]");
 		long ini = System.currentTimeMillis();
 		try {
-			
+
 			LocalDateTime localDateTime = LocalDateTime.now();
 
-			if (StringUtils.equals(periodo,constant.PERIODO_7_21)) {
-				int ora=localDateTime.getHour();
-				ora+=10;
-				log.info("ora:"+ora);
-				if (ora < 7 || ora > 21) {
-					log.info("ore:"+ora+" ---> NO PING");
+			if (StringUtils.equals(periodo, Constant.PERIODO_ORARIO)) {
+				// ore 8/20;
+				StringTokenizer st = new StringTokenizer(Constant.PERIODO_ORARIO);
+				st.nextToken();
+				st = new StringTokenizer(st.nextToken(), "/");
+				int oraIniPing = new Integer(st.nextToken()).intValue();
+				int oraEndPing = new Integer(st.nextToken()).intValue();
+				int ora = localDateTime.getHour();
+				// ora-=10;
+				log.info("ora:" + ora);
+				if (ora < oraIniPing || ora > oraEndPing) {
+					log.info("ore:" + ora + " ---> NO PING");
 					return;
 				}
 			}
-            utility.setConn();
+			pingKO.clear();
+			Utility.setConn();
 			HashMap<String, String> hm = new HashMap<String, String>();
-			hm = utility.getClientiXDSL(utility.conn);
+			hm = Utility.getClientiXDSL(Utility.conn);
 			for (Map.Entry<String, String> cip : hm.entrySet()) {
 				String ip = cip.getValue();
 				String cliente = cip.getKey();
@@ -81,8 +93,8 @@ public class PingJob implements Job {
 
 			}
 
-			utility.closeConn();
-			
+			Utility.closeConn();
+
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -91,6 +103,25 @@ public class PingJob implements Job {
 
 		log.info("time for all ping:" + (System.currentTimeMillis() - ini) / 60000 + " min");
 
+		// invio email in caso di ping KO
+		if (!pingKO.isEmpty()) {
+			String cl = " cliente";
+			if (pingKO.size() > 1)
+				cl = " clienti";
+
+			String oggetto = "ping KO ADSL: " + pingKO.size() + cl;
+			Set<Entry<String, String>> set = pingKO.entrySet();
+			Iterator<Entry<String, String>> iterator = set.iterator();
+			String textEmail = "lista IP e clienti:\n";
+			while (iterator.hasNext()) {
+				@SuppressWarnings("rawtypes")
+				Map.Entry mentry = (Map.Entry) iterator.next();
+				textEmail += mentry.getKey() + " - " + mentry.getValue() + "\n";
+			}
+			new SendMailTLS().sendEmailFromSupport(oggetto, textEmail);
+		}
+
+		log.info("email sended OK");
 	}
 
 	public void doCommand(List<String> command, String cliente) {
@@ -100,7 +131,8 @@ public class PingJob implements Job {
 
 			ProcessBuilder pb = new ProcessBuilder(command);
 			Process process = pb.start();
-
+			LocalDateTime localDateTime = LocalDateTime.now(); 
+			
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
@@ -109,6 +141,7 @@ public class PingJob implements Job {
 			String ip = "";
 			int ptx = -1, prx = -1, ploss = -1, time = -1;
 			double min = -1, avg = -1, max = -1, mdev = -1;
+			
 			while ((s = stdInput.readLine()) != null) {
 				// System.out.println(s);
 				if (s.startsWith("PING")) {
@@ -125,7 +158,10 @@ public class PingJob implements Job {
 					// String sub=s., ",");
 					ptx = new Integer(StringUtils.substringBefore(sp.nextToken(), "packets").trim()).intValue();
 					prx = new Integer(StringUtils.substringBefore(sp.nextToken(), "received").trim()).intValue();
-					ploss = new Integer(StringUtils.substringBefore(sp.nextToken(), "%").trim()).intValue();
+					String packetLoss = sp.nextToken();
+					if (StringUtils.contains(packetLoss, "errors"))
+						packetLoss = sp.nextToken();
+					ploss = new Integer(StringUtils.substringBefore(packetLoss, "%").trim()).intValue();
 					String t = StringUtils.substringAfter(sp.nextToken(), "time").trim();
 					time = new Integer(StringUtils.substringBefore(t, "ms").trim()).intValue();
 					log.warn("ptx  :" + ptx);
@@ -160,13 +196,18 @@ public class PingJob implements Job {
 				log.warn("---------------------------------------------------->Error:" + s);
 			}
 
-			if (StringUtils.equals(loglevel,constant.LOGLEVEL_TUTTO))
-				logPingData(cliente,ip,nping,ptx,prx,ploss,min,max,avg,mdev,time);
-			
-			if (StringUtils.equals(loglevel, constant.LOGLEVEL_PINGKO) && ploss != 0) 
-				logPingData(cliente,ip,nping,ptx,prx,ploss,min,max,avg,mdev,time);
-			
+			if (StringUtils.equals(loglevel, Constant.LOGLEVEL_TUTTO))
+				logPingData(cliente, ip, nping, ptx, prx, ploss, min, max, avg, mdev, time);
 
+			if (StringUtils.equals(loglevel, Constant.LOGLEVEL_PINGKO) && ploss != 0) {
+				logPingData(cliente, ip, nping, ptx, prx, ploss, min, max, avg, mdev, time);
+			}
+
+			if (ploss != 0) {
+				StringTokenizer st= new StringTokenizer(localDateTime.toString(),"T");
+				String timeNow=st.nextToken()+" "+st.nextToken();
+				pingKO.put(timeNow+" - "+ip, cliente);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("Exception:" + e.getMessage());
@@ -174,19 +215,18 @@ public class PingJob implements Job {
 
 	}
 
-	
-	private static void logPingData(String cl,String ip, String nping, int ptx, int prx, int ploss, double min, double max, double avg, double mdev, int time) throws SQLException {
-		
-		utility.stmt = utility.conn.createStatement();
+	private static void logPingData(String cl, String ip, String nping, int ptx, int prx, int ploss, double min,
+			double max, double avg, double mdev, int time) throws SQLException {
+
+		Utility.stmt = Utility.conn.createStatement();
 		Timestamp now = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
 		String sql = "INSERT INTO ping(cliente, ip, nping, ptx, prx, ploss, min, max, avg, mdev,ttime, data)"
-				+ " VALUES ('" + cl + "','" + ip + "'," + nping + "," + ptx + "," + prx + "," + ploss + ","
-				+ min + "," + max + "," + avg + "," + mdev + "," + time + ",'" + now + "')";
+				+ " VALUES ('" + cl + "','" + ip + "'," + nping + "," + ptx + "," + prx + "," + ploss + "," + min + ","
+				+ max + "," + avg + "," + mdev + "," + time + ",'" + now + "')";
 		log.warn("sql:" + sql);
-		utility.stmt.executeUpdate(sql);
+		Utility.stmt.executeUpdate(sql);
 		log.warn("inserted on db");
-		
+
 	}
-	
 
 }

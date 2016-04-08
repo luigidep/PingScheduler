@@ -1,8 +1,8 @@
 package it.ldp.pingscheduler;
 
-public class constant {
+public class Constant {
 	
-	public static final String PERIODO_7_21="ore 7/21";
+	public static final String PERIODO_ORARIO="ore 8/20";
 	public static final String PERIODO_SEMPRE="sempre";
 	public static final String LOGLEVEL_TUTTO="tutto";
 	public static final String LOGLEVEL_PINGKO="ping KO";
