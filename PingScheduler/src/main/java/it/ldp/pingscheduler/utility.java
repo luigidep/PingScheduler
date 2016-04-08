@@ -5,10 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 public class utility {
@@ -183,65 +181,6 @@ public class utility {
 		} catch (Exception e) {
 			log.error("Exception:" + e.getMessage());
 		}
-	}
-
-	/**
-	 * 
-	 * @param conn
-	 * @param table
-	 * @return
-	 */
-	public static String concellaLogPing(String periodo, String tipolog) {
-		setConn();
-		Statement st = null;
-		String strRowsDeleted = "nessun record cancellato";
-		try {
-
-			st = conn.createStatement();
-			String sql = "delete from ping_test where 1=1 ";
-
-			LocalDateTime localDateTime = LocalDateTime.now();
-			switch (periodo) {
-			case "1":
-				localDateTime=localDateTime.minusDays(1);
-				break;
-			case "7":
-				localDateTime=localDateTime.minusDays(7);
-				break;
-			case "1m":
-				localDateTime=localDateTime.minusMonths(1);
-				break;
-
-			default:
-				break;
-			}
-
-			String yyyymmdd=StringUtils.substringBefore(localDateTime.toString(),"T");
-			sql += "\nand data < '"+yyyymmdd+"'";
-
-			if (StringUtils.equals(constant.CANCELLA_PINGOK, tipolog))
-				sql += "\nand ploss = 0";
-
-			log.info("sql:" + sql);
-
-			int rowsDeleted = st.executeUpdate(sql);
-			if (rowsDeleted > 0)
-				strRowsDeleted = "cancellati " + rowsDeleted + " records";
-
-
-		} catch (Exception e) {
-			log.error("Exception e:" + e.getMessage());
-
-		} finally {
-			try {
-				if (st != null)
-					st.close();
-			} catch (Exception e2) {
-				log.error("Exception e2:" + e2.getMessage());
-			}
-		}
-		closeConn();
-		return strRowsDeleted;
 	}
 
 }
