@@ -19,7 +19,7 @@ public class SendMailTLS {
 
 	static final String username = "supporto@astelutilities.com";
 	static final String password = "support0";
-	static String emails = "luigi.depizzol@gmail.com";
+	static String emails = "";
 
 	public static void main(String[] args) {
 

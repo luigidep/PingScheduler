@@ -30,19 +30,12 @@ public class PingJob implements Job {
 
 	private static Logger log = Logger.getLogger(PingJob.class.getName());
 
-	// JDBC driver name and database URL
-	static String JDBC_DRIVER_p = "org.postgresql.Driver";
-	static String DB_URL_p = "jdbc:postgresql://localhost:5432/astelu";
-	// Database credentials
-	static String USER_p = "astelu";
-	static String PASS_p = "astelu";
-
-	static final String JDBC_DRIVER = "net.sourceforge.jtds.jdbc.Driver";
-	static final String DB_URL = "jdbc:jtds:sqlserver://server-hp/SQLEXPRESS;databaseName=Mexal_Telefonate";
+	static String JDBC_DRIVER = "";
+	static String DB_URL = "";
 
 	// Database credentials
-	static final String USER = "jdbc";
-	static final String PASS = "jdbc";
+	static String USER = "";
+	static String PASS = "";
 
 	// static Connection conn = null;
 	// static Statement stmt = null;
@@ -58,7 +51,7 @@ public class PingJob implements Job {
 				+ loglevel + "," + periodo + "]");
 		long ini = System.currentTimeMillis();
 		try {
-
+            Utility.initConfig();
 			LocalDateTime localDateTime = LocalDateTime.now();
 
 			if (StringUtils.equals(periodo, Constant.PERIODO_ORARIO)) {

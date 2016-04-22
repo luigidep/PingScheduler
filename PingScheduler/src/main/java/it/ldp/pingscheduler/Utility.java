@@ -1,12 +1,16 @@
 package it.ldp.pingscheduler;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Properties;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 public class Utility {
@@ -181,6 +185,29 @@ public class Utility {
 		} catch (Exception e) {
 			log.error("Exception:" + e.getMessage());
 		}
+	}
+	
+	/**
+	 * 
+	 * @throws IOException
+	 */
+	static void initConfig() throws IOException {
+
+		BasicConfigurator.configure();
+		log.info("main start");
+		Properties prop = new Properties();
+		InputStream input = Utility.class.getClassLoader().getResourceAsStream("config.properties");
+
+		// load a properties file
+		prop.load(input);
+		PingJob.DB_URL=prop.getProperty("DB_URL");
+		PingJob.JDBC_DRIVER=prop.getProperty("JDBC_DRIVER");
+		PingJob.PASS=prop.getProperty("PASS");
+		PingJob.USER=prop.getProperty("USER");
+		// CDRHandler.operatori=prop.getProperty("operatori");
+		SendMailTLS.emails = prop.getProperty("emails");
+		input.close();
+
 	}
 
 }
