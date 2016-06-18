@@ -12,7 +12,47 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 	<description>gestione processo di ping per le connessioni adsl</description>
+	<build>
+
+
+		<!-- Make this jar executable -->
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>it.ldp.pingscheduler.PingSchedulerGUI</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>it.ldp.pingscheduler.PingSchedulerGUI</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
+
+
 
 		<!-- Quartz library -->
 		<dependency>

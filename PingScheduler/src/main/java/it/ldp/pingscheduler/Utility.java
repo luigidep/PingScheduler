@@ -123,6 +123,7 @@ public class Utility {
 		return hm;
 	}
 
+
 	/**
 	 * 
 	 * @param conn
@@ -137,14 +138,22 @@ public class Utility {
 
 			st = conn.createStatement();
 
-			String sql = "SELECT a.ragsoc, b.ip from ClientiServizi a, clientiXDSL b "
-					+ "where a.id=b.idcliente and b.ip <> '' and b.ping = 'X'";
+			//String sql = "SELECT a.ragsoc, b.ip from ClientiServizi a, clientiXDSL b "
+				//	+ "where a.id=b.idcliente and b.ip <> '' and b.ping = 'X'";
 
+			String sql = "SELECT ragsoc, ip from clientiXDSL "
+					+ "where ip <> '' and ping = 'X'";
+
+			
 			rs = st.executeQuery(sql);
+            IPAddressValidator ipav=new IPAddressValidator(); 
+			while (rs.next()) {
+				String ip=rs.getString(2);
+				if (!ipav.validate(ip))
+					continue;
 
-			while (rs.next())
-				hm.put(rs.getString(1), rs.getString(2));
-
+				hm.put(rs.getString(1), ipav.cleanIP(ip));
+			}
 		} catch (Exception e) {
 			log.error("Exception e:" + e.getMessage());
 

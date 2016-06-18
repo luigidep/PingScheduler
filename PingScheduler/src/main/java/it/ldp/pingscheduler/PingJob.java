@@ -73,8 +73,10 @@ public class PingJob implements Job {
 			Utility.setConn();
 			HashMap<String, String> hm = new HashMap<String, String>();
 			hm = Utility.getClientiXDSL(Utility.conn);
+			
 			for (Map.Entry<String, String> cip : hm.entrySet()) {
 				String ip = cip.getValue();
+				
 				String cliente = cip.getKey();
 
 				List<String> commands = new ArrayList<String>();
