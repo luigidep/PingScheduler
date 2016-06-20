@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +45,7 @@ public class PingJob implements Job {
 	static String periodo = "sempre";
 	static String intervallo = "15";
 
-	HashMap<String, String> pingKO = new HashMap<String, String>();
+	TreeMap<String, String> pingKO = new TreeMap<String, String>();
 
 	public void execute(JobExecutionContext jExeCtx) throws JobExecutionException {
 		log.info("start ping job parameter [intervallo,nping,loglevel,periodo]:[" + intervallo + "," + nping + ","
@@ -100,6 +101,7 @@ public class PingJob implements Job {
 
 		// invio email in caso di ping KO
 		if (!pingKO.isEmpty()) {
+			
 			String cl = " cliente";
 			if (pingKO.size() > 1)
 				cl = " clienti";
@@ -111,8 +113,9 @@ public class PingJob implements Job {
 			while (iterator.hasNext()) {
 				@SuppressWarnings("rawtypes")
 				Map.Entry mentry = (Map.Entry) iterator.next();
-				textEmail += mentry.getKey() + " - " + mentry.getValue() + "\n";
+				textEmail += mentry.getValue()+" - "+ mentry.getKey()+ "\n";
 			}
+			
 			new SendMailTLS().sendEmailFromSupport(oggetto, textEmail);
 		}
 
@@ -201,7 +204,7 @@ public class PingJob implements Job {
 			if (ploss != 0) {
 				StringTokenizer st= new StringTokenizer(localDateTime.toString(),"T");
 				String timeNow=st.nextToken()+" "+st.nextToken();
-				pingKO.put(timeNow+" - "+ip, cliente);
+				pingKO.put(cliente,timeNow+" - "+ip);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

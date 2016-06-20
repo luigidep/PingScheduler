@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
@@ -147,13 +148,19 @@ public class Utility {
 			
 			rs = st.executeQuery(sql);
             IPAddressValidator ipav=new IPAddressValidator(); 
+            String textIPMalformed="";
 			while (rs.next()) {
 				String ip=rs.getString(2);
-				if (!ipav.validate(ip))
+				if (!ipav.validate(ip)) {
+					textIPMalformed+=ip + " - " + rs.getString(1) + "\n";
 					continue;
-
+				}
 				hm.put(rs.getString(1), ipav.cleanIP(ip));
 			}
+			
+			if (StringUtils.isNotEmpty(textIPMalformed))
+					new SendMailTLS().sendEmailFromSupport("indirizzo IP non corretto", textIPMalformed);
+			
 		} catch (Exception e) {
 			log.error("Exception e:" + e.getMessage());
 
